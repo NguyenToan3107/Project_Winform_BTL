@@ -17,6 +17,9 @@ CREATE TABLE [dbo].[Bill](
 	[PaymentMethod] [nvarchar](50) NULL,
 	[StaffName] [nvarchar](50) NULL,
 	[Cart_ID] [int] NOT NULL,
+	[TotalDiscountAmount] [float] NULL,
+	[TotalAmount] [float] NULL,
+	[TotalItem] [int] NULL,
  CONSTRAINT [PK_Bill] PRIMARY KEY CLUSTERED 
 (
 	[Bill_ID] ASC
@@ -125,6 +128,7 @@ CREATE TABLE [dbo].[Item](
 	[ReleaseDate] [datetime] NULL,
 	[Price] [int] NULL,
 	[Discount_ID] [int] NOT NULL,
+	[Image] nvarchar(100) not null default '',
  CONSTRAINT [PK_Item] PRIMARY KEY CLUSTERED 
 (
 	[Item_ID] ASC
@@ -132,7 +136,15 @@ CREATE TABLE [dbo].[Item](
 ) ON [PRIMARY]
 GO
 
-
+CREATE TABLE Inventory (
+    Inventory_id INT PRIMARY KEY IDENTITY(1,1),
+    Item_ID INT,
+    Inven_number INT,
+	Inven_sold_revenue decimal(18, 2),
+	Inven_sold_quantity int,
+	dateBill [datetime] NULL,
+    FOREIGN KEY (Item_ID) REFERENCES Item (Item_ID)
+);
 
 /****** Object:  Table [dbo].[SelectedItem]    Script Date: 10/5/2023 23:50:47 ******/
 SET ANSI_NULLS ON
@@ -236,88 +248,20 @@ VALUES
 	(31, 1)
 
 INSERT INTO [dbo].[Customer]
-([Customer_ID], [BirthDate], [Address], [PhoneNumber], [CustomerType], [Point], [CreateTime], [Email], [FullName])
+([Customer_ID], [BirthDate], [Address], [PhoneNumber], [CustomerType], [Point], [CreateTime], [Email], [FullName], [Username], [Password])
 VALUES
-	(045678901, '1993-11-08', N'Đà Nẵng', '0956781234', N'Khách mua lẻ', 60, '2022-07-22', 'thanh045678901234@gmail.com', N'Lê Thanh'),
-	(056789012, '1980-09-17', N'Hà Nội', '0865432109', N'Khách mua buôn', 85, '2022-12-15', 'hoang056789012345@gmail.com', N'Phạm Văn Hoàng'),
-	(067890123, '1995-03-25', N'TP HCM', '0978901234', N'Khách mua lẻ', 70, '2022-06-30', 'my067890123456@gmail.com', N'Nguyễn Thị Mỹ'),
-	(078901234, '1987-02-14', N'Đà Lạt', '0823456789', N'Khách mua buôn', 110, '2022-11-28', 'thien078901234567@gmail.com', N'Nguyễn Văn Thiện'),
-	(089012345, '1991-06-10', N'Hà Nội', '0987651234', N'Khách mua lẻ', 55, '2022-10-01', 'phuong089012345678@gmail.com', N'Nguyễn Thị Phương'),
-	(090123456, '1983-04-12', N'Hải Phòng', '0934567890', N'Khách mua buôn', 95, '2022-09-18', 'trung090123456789@gmail.com', N'Vũ Trọng Trung'),
-	(012345678, '1994-08-19', N'Đà Nẵng', '0956789123', N'Khách mua lẻ', 80, '2022-08-14', 'linh012345678900@gmail.com', N'Phạm Thị Linh'),
-	(023456789, '1982-12-31', N'TP HCM', '0887654321', N'Khách mua buôn', 125, '2022-07-10', 'nam023456789012@gmail.com', N'Nguyễn Văn Nam'),
-	(034567890, '1990-07-06', N'Hà Nội', '0967890123', N'Khách mua lẻ', 70, '2022-12-05', 'hien034567890123@gmail.com', N'Nguyễn Thị Hiền'),
-	(045678902, '1986-05-28', N'Nha Trang', '0856789012', N'Khách mua buôn', 115, '2022-11-19', 'tuan045678901234@gmail.com', N'Phan Văn Tuấn'),
-	(027203003, '1999-05-20', N'Hà Nội', '0354857894', N'Khách mua buôn', 100, '2022-10-25', 'hai027203003102@gmail.com', N'Nguyễn Văn Hải'),
-	(023201485, '1984-07-11', N'TP HCM', '0995412241', N'Khách mua lẻ', 50, '2022-11-05', 'bich023201485621@gmail.com', N'Trần Thị Bích');
+	(045678901, '1993-11-08', N'Đà Nẵng', '0956781234', N'Khách mua lẻ', 60, '2022-07-22', 'thanh045678901234@gmail.com', N'Lê Thanh', N'thanhle1234', '123456'),
+	(056789012, '1980-09-17', N'Hà Nội', '0865432109', N'Khách mua buôn', 85, '2022-12-15', 'hoang056789012345@gmail.com', N'Phạm Văn Hoàng', N'hoangpham1234', '123456'),
+	(067890123, '1995-03-25', N'TP HCM', '0978901234', N'Khách mua lẻ', 70, '2022-06-30', 'my067890123456@gmail.com', N'Nguyễn Thị Mỹ', N'nguyenmy1234', '123456'),
+	(078901234, '1987-02-14', N'Đà Lạt', '0823456789', N'Khách mua buôn', 110, '2022-11-28', 'thien078901234567@gmail.com', N'Nguyễn Văn Thiện', N'thiennguyen', '123456'),
+	(089012345, '1991-06-10', N'Hà Nội', '0987651234', N'Khách mua lẻ', 55, '2022-10-01', 'phuong089012345678@gmail.com', N'Nguyễn Thị Phương', N'phuongnguyen', '123456'),
+	(090123456, '1983-04-12', N'Hải Phòng', '0934567890', N'Khách mua buôn', 95, '2022-09-18', 'trung090123456789@gmail.com', N'Vũ Trọng Trung', N'vutrung1234', '123456'),
+	(012345678, '1994-08-19', N'Đà Nẵng', '0956789123', N'Khách mua lẻ', 80, '2022-08-14', 'linh012345678900@gmail.com', N'Phạm Thị Linh', N'phamlinh1234', '123456'),
+	(023456789, '1982-12-31', N'TP HCM', '0887654321', N'Khách mua buôn', 125, '2022-07-10', 'nam023456789012@gmail.com', N'Nguyễn Văn Nam', N'namnguyen1234', '123456'),
+	(034567890, '1990-07-06', N'Hà Nội', '0967890123', N'Khách mua lẻ', 70, '2022-12-05', 'hien034567890123@gmail.com', N'Nguyễn Thị Hiền', N'hiennguyen1234', '123456'),
+	(045678902, '1986-05-28', N'Nha Trang', '0856789012', N'Khách mua buôn', 115, '2022-11-19', 'tuan045678901234@gmail.com', N'Phan Văn Tuấn', N'tuanpham1234', '123456'),
+	(027203003, '1999-05-20', N'Hà Nội', '0354857894', N'Khách mua buôn', 100, '2022-10-25', 'hai027203003102@gmail.com', N'Nguyễn Văn Hải', N'hainguyen1234', '123456'),
+	(023201485, '1984-07-11', N'TP HCM', '0995412241', N'Khách mua lẻ', 50, '2022-11-05', 'bich023201485621@gmail.com', N'Trần Thị Bích', N'tranbich1234', '123456'),
+	(023201286, '1984-07-11', N'TP HCM', '0995412241', N'Khách mua lẻ', 0, '2022-11-05', 'admin', N'admin', 'admin', 'admin');
 
-
---INSERT INTO [dbo].[Cart] ([Cart_ID], [TotalItem], [Customer_ID], [SelectedItem_ID])
---VALUES
---    (1, 5, 1, 1),
---    (2, 3, 2, 2),
---    (3, 6, 3, 3),
---    (4, 4, 4, 4),
---    (5, 2, 5, 5),
---    (6, 3, 1, 6),
---    (7, 2, 2, 7),
---    (8, 4, 3, 8),
---    (9, 5, 4, 9),
---    (10, 1, 5, 10);
-
-
---INSERT INTO [dbo].[Bill] ([Bill_ID], [CreateTime], [TotalItem], [SubTotal], [TotalDiscountAmount], [TotalAmount], [Status], [PaymentMethod], [StaffName], [Cart_ID])
---VALUES
---    (1, '2023-10-06 09:30:00', 3, 45.75, 5.25, 50.00, 'Paid', 'Credit Card', 'Alice Johnson', 1),
---    (2, '2023-10-06 10:15:00', 2, 30.50, 2.00, 28.50, 'Paid', 'Cash', 'Bob Smith', 2),
---    (3, '2023-10-06 11:00:00', 5, 75.00, 10.00, 65.00, 'Pending', 'Debit Card', 'Eva Davis', 3),
---    (4, '2023-10-06 12:45:00', 4, 60.00, 8.00, 52.00, 'Paid', 'Cash', 'David Wilson', 4),
---    (5, '2023-10-06 13:30:00', 6, 90.00, 12.50, 77.50, 'Paid', 'Credit Card', 'Grace Brown', 5);
-
-
-
-
-
-
-
-
-
---select * from [dbo].[Bill]
---select * from [dbo].[Cart]
---select * from [dbo].[Customer]
---select * from [dbo].[Discount]
---select * from [dbo].[Item]
---select * from [dbo].[SelectedItem]
-
-alter table [dbo].[Bill]
-add [TotalDiscountAmount] [float] NULL
-
-alter table [dbo].[Bill]
-add [TotalAmount] [float] NULL
-
-alter table [dbo].[Bill]
-add [TotalItem] [int] NULL
-
-CREATE TABLE Inventory (
-    Inventory_id INT PRIMARY KEY IDENTITY(1,1),
-    Item_ID INT,
-    Inven_number INT,
-    FOREIGN KEY (Item_ID) REFERENCES Item (Item_ID)
-);
-
-
--- add image to item
-ALTER TABLE [dbo].[Item]
-add Image nvarchar(100) not null default ''
-
-alter table [dbo].[Inventory]
-add Inven_sold_revenue decimal(18, 2)
-
-alter table [dbo].[Inventory]
-add Inven_sold_quantity int
-
-alter table [dbo].[Inventory]
-add dateBill [datetime] NULL
-
-alter table [dbo].[Customer]
-add role nvarchar(50)
+delete from [dbo].[Customer]
