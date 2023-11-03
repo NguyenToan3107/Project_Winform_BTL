@@ -76,6 +76,8 @@ CREATE TABLE [dbo].[Customer](
 	[CreateTime] [datetime] NULL,
 	[Email] [nvarchar](50) NULL,
 	[FullName] [nvarchar](50) NULL,
+	[Username] [nvarchar](50) NULL,
+	[Password] [nvarchar](50) NULL,
  CONSTRAINT [PK_Customer] PRIMARY KEY CLUSTERED 
 (
 	[Customer_ID] ASC
