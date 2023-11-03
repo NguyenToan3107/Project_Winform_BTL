@@ -263,5 +263,3 @@ VALUES
 	(027203003, '1999-05-20', N'Hà Nội', '0354857894', N'Khách mua buôn', 100, '2022-10-25', 'hai027203003102@gmail.com', N'Nguyễn Văn Hải', N'hainguyen1234', '123456'),
 	(023201485, '1984-07-11', N'TP HCM', '0995412241', N'Khách mua lẻ', 50, '2022-11-05', 'bich023201485621@gmail.com', N'Trần Thị Bích', N'tranbich1234', '123456'),
 	(023201286, '1984-07-11', N'TP HCM', '0995412241', N'Khách mua lẻ', 0, '2022-11-05', 'admin', N'admin', 'admin', 'admin');
-
-delete from [dbo].[Customer]
